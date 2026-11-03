@@ -1,0 +1,13 @@
+{
+  "domain": "cosysense",
+  "name": "Cosysense",
+  "codeowners": ["@sh969"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/cosysense/homeassistant-cosysense",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/cosysense/homeassistant-cosysense/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

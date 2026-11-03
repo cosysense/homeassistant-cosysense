@@ -1,0 +1,18 @@
+{
+  "sites": [
+    {
+      "siteUUID": "00000000-0000-4000-8000-000000000001",
+      "name": "Demo Office",
+      "floors": []
+    },
+    {
+      "siteUUID": "00000000-0000-4000-8000-000000000002",
+      "name": "Demo Warehouse",
+      "floors": []
+    }
+  ],
+  "portfolios": [],
+  "floorplans_count": 0,
+  "alarms_count": 0,
+  "capabilities": {}
+}

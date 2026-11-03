@@ -1,0 +1,682 @@
+{
+  "components": {
+    "schemas": {
+      "DashboardMeta": {
+        "additionalProperties": true,
+        "description": "Every site the caller's grants reach, each with its floors.",
+        "properties": {
+          "alarms_count": {
+            "default": 0,
+            "title": "Alarms Count",
+            "type": "integer"
+          },
+          "capabilities": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "default": {},
+            "title": "Capabilities",
+            "type": "object"
+          },
+          "floorplans_count": {
+            "default": 0,
+            "title": "Floorplans Count",
+            "type": "integer"
+          },
+          "portfolios": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MetaPortfolio"
+            },
+            "title": "Portfolios",
+            "type": "array"
+          },
+          "sites": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MetaSite"
+            },
+            "title": "Sites",
+            "type": "array"
+          }
+        },
+        "title": "DashboardMeta",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "MetaFloor": {
+        "additionalProperties": true,
+        "properties": {
+          "buildingName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buildingname"
+          },
+          "buildingPhotoUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buildingphotourl"
+          },
+          "buildingUUID": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buildinguuid"
+          },
+          "floorUUID": {
+            "title": "Flooruuid",
+            "type": "string"
+          },
+          "modelled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modelled"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "siteName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sitename"
+          },
+          "siteUUID": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Siteuuid"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          }
+        },
+        "required": [
+          "floorUUID"
+        ],
+        "title": "MetaFloor",
+        "type": "object"
+      },
+      "MetaPortfolio": {
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "portfolioUUID": {
+            "title": "Portfoliouuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "portfolioUUID"
+        ],
+        "title": "MetaPortfolio",
+        "type": "object"
+      },
+      "MetaSite": {
+        "additionalProperties": true,
+        "properties": {
+          "buildingAutopilot": {
+            "additionalProperties": {
+              "enum": [
+                "none",
+                "off",
+                "on"
+              ],
+              "type": "string"
+            },
+            "default": {},
+            "title": "Buildingautopilot",
+            "type": "object"
+          },
+          "buildingsWithUtilities": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Buildingswithutilities",
+            "type": "array"
+          },
+          "floors": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MetaFloor"
+            },
+            "title": "Floors",
+            "type": "array"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "organizationIconUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organizationiconurl"
+          },
+          "organizationLogoUrl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organizationlogourl"
+          },
+          "organizationUUID": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organizationuuid"
+          },
+          "portfolioUUID": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portfoliouuid"
+          },
+          "siteUUID": {
+            "title": "Siteuuid",
+            "type": "string"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          }
+        },
+        "required": [
+          "siteUUID"
+        ],
+        "title": "MetaSite",
+        "type": "object"
+      },
+      "SiteEquipment": {
+        "properties": {
+          "building_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Building Name"
+          },
+          "dev_eui": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "LoRaWAN device EUI, when exactly one device feeds the equipment.",
+            "title": "Dev Eui"
+          },
+          "entity_class": {
+            "description": "Brick class, e.g. Sensor_Equipment or Building_Gas_Meter.",
+            "title": "Entity Class",
+            "type": "string"
+          },
+          "equipment_uuid": {
+            "title": "Equipment Uuid",
+            "type": "string"
+          },
+          "level_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level Name"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "points": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SitePoint"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "space_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Studio room name, used as the suggested area.",
+            "title": "Space Name"
+          },
+          "space_uuid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Space Uuid"
+          },
+          "template": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sensor template, Manufacturer-Model, when known.",
+            "title": "Template"
+          }
+        },
+        "required": [
+          "equipment_uuid",
+          "name",
+          "entity_class"
+        ],
+        "title": "SiteEquipment",
+        "type": "object"
+      },
+      "SitePoint": {
+        "properties": {
+          "cumulative": {
+            "default": false,
+            "description": "True for a meter index that only grows (energy, gas, water).",
+            "title": "Cumulative",
+            "type": "boolean"
+          },
+          "entity_class": {
+            "description": "Brick class of the point, e.g. CO2_Sensor.",
+            "title": "Entity Class",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "point_uuid": {
+            "title": "Point Uuid",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "QUDT unit symbol the reading is served in, e.g. KiloW-HR, M3, DEG_C.",
+            "title": "Unit"
+          },
+          "value_type": {
+            "default": "numeric",
+            "description": "numeric, boolean or enum.",
+            "title": "Value Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "point_uuid",
+          "name",
+          "entity_class"
+        ],
+        "title": "SitePoint",
+        "type": "object"
+      },
+      "SiteReading": {
+        "properties": {
+          "point_uuid": {
+            "title": "Point Uuid",
+            "type": "string"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "UTC time of the last write. An unchanged value is rewritten at most every 300 s, so a steady reading can look up to 300 s older than the last uplink.",
+            "title": "Updated At"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest value in the point's unit, calibration applied. Booleans arrive as 0 or 1.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "point_uuid"
+        ],
+        "title": "SiteReading",
+        "type": "object"
+      },
+      "SiteReadings": {
+        "properties": {
+          "readings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SiteReading"
+            },
+            "title": "Readings",
+            "type": "array"
+          },
+          "site_uuid": {
+            "title": "Site Uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "site_uuid"
+        ],
+        "title": "SiteReadings",
+        "type": "object"
+      },
+      "SiteSensors": {
+        "properties": {
+          "equipment": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SiteEquipment"
+            },
+            "title": "Equipment",
+            "type": "array"
+          },
+          "site_uuid": {
+            "title": "Site Uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "site_uuid"
+        ],
+        "title": "SiteSensors",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Cosysense customer API (Home Assistant subset)",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/dashboard/meta": {
+      "get": {
+        "operationId": "customer_dashboard_meta",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardMeta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Meta",
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/api/sites/{site_uuid}/readings": {
+      "get": {
+        "description": "Latest value per point, calibrated into the unit the sensors route lists.\nPoints with no value yet are absent.",
+        "operationId": "customer_site_readings",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "site_uuid",
+            "required": true,
+            "schema": {
+              "title": "Site Uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteReadings"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Latest reading of every point on a site",
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/api/sites/{site_uuid}/sensors": {
+      "get": {
+        "description": "Every sensor and meter on the site that has at least one live point,\nwith room, level and building names. Changes only when the site is remodelled:\npoll it rarely (hourly).",
+        "operationId": "customer_site_sensors",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "site_uuid",
+            "required": true,
+            "schema": {
+              "title": "Site Uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteSensors"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sensors and meters of a site, with their points",
+        "tags": [
+          "customer"
+        ]
+      }
+    }
+  }
+}

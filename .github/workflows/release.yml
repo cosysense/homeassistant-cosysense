@@ -1,0 +1,20 @@
+name: Release
+
+# Tags are pushed by the Cosysense publish job. This turns each into a GitHub
+# release so HACS can offer it.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "Cosysense $GITHUB_REF_NAME" --generate-notes

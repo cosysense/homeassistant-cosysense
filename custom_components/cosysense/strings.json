@@ -1,0 +1,55 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Cosysense",
+        "description": "Enter the app client ID and refresh token Cosysense gave you. They are read-only and cover only the sites you were granted.",
+        "data": {
+          "client_id": "Client ID",
+          "refresh_token": "Refresh token",
+          "base_url": "API address",
+          "region": "Sign-in region"
+        }
+      },
+      "site": {
+        "title": "Choose sites",
+        "description": "Each site becomes its own entry.",
+        "data": {
+          "sites": "Sites"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Cosysense needs a new token",
+        "description": "The token for {site} was rejected. It may have expired (tokens last 90 days) or been revoked. Enter a new one.",
+        "data": {
+          "client_id": "Client ID",
+          "refresh_token": "Refresh token"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "The client ID or refresh token was rejected.",
+      "cannot_connect": "Could not reach Cosysense.",
+      "https_required": "The API address must start with https://.",
+      "site_not_granted": "This token does not cover this site.",
+      "no_site_selected": "Pick at least one site."
+    },
+    "abort": {
+      "already_configured": "All sites this token covers are already added.",
+      "no_sites": "This token covers no sites.",
+      "reauth_successful": "Token updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Cosysense options",
+        "data": {
+          "scan_interval": "Poll interval",
+          "stale_hours": "Mark a sensor unavailable after",
+          "levels": "Only show these buildings and levels (empty shows all)"
+        }
+      }
+    }
+  }
+}
