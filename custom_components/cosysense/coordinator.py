@@ -1,4 +1,8 @@
-"""Polls one site: inventory hourly, readings every scan interval."""
+"""One site: inventory hourly, readings every scan interval, live pushes between.
+
+With push on (the inventory carries a push block), changed readings arrive over
+MQTT and are applied without touching the poll schedule; the poll then runs
+hourly only to reconcile anything a push missed."""
 from __future__ import annotations
 
 import logging
@@ -7,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
@@ -20,6 +24,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     INVENTORY_REFRESH,
+    PUSH_RECONCILE_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,19 +49,23 @@ class CosysenseCoordinator(DataUpdateCoordinator[SiteData]):
     config_entry: ConfigEntry
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry, api: CosysenseApi) -> None:
-        interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+        self._poll_interval = timedelta(seconds=entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
         super().__init__(
             hass,
             _LOGGER,
             config_entry=entry,
             name=DOMAIN,
-            update_interval=timedelta(seconds=interval),
+            update_interval=self._poll_interval,
         )
         self.api = api
         self.site_uuid: str = entry.data[CONF_SITE_UUID]
         self._inventory: list[dict[str, Any]] | None = None
         self._inventory_at: datetime | None = None
         self.all_levels: list[str] = []
+        self.push_config: dict[str, Any] | None = None
+        self.push = None  # CosysensePush, set by async_setup_entry when push is on
+        # stream_id -> [(point_uuid, scale)]: several points can share one stream.
+        self._streams: dict[str, list[tuple[str, float]]] = {}
 
     def _filtered(self, equipment: list[dict[str, Any]]) -> list[dict[str, Any]]:
         wanted = set(self.config_entry.options.get(CONF_LEVELS) or [])
@@ -72,11 +81,16 @@ class CosysenseCoordinator(DataUpdateCoordinator[SiteData]):
             if self._inventory is None or now - self._inventory_at >= INVENTORY_REFRESH:
                 inventory = await self.api.sensors(self.site_uuid)
                 previous = self._point_ids(self._inventory)
+                had_push = self.push_config is not None
                 self._inventory = inventory.get("equipment", [])
                 self._inventory_at = now
                 self.all_levels = sorted({level_key(e) for e in self._inventory})
-                if previous is not None and previous != self._point_ids(self._inventory):
-                    # New or removed sensors: reload so entities match the model.
+                self.push_config = inventory.get("push") or None
+                self._streams = self._stream_map(self._inventory)
+                if previous is not None and (
+                    previous != self._point_ids(self._inventory) or had_push != (self.push_config is not None)
+                ):
+                    # New or removed sensors, or push switched: reload so entities match the model.
                     self.hass.config_entries.async_schedule_reload(self.config_entry.entry_id)
             readings = await self.api.readings(self.site_uuid)
         except CosysenseAuthError as err:
@@ -87,6 +101,44 @@ class CosysenseCoordinator(DataUpdateCoordinator[SiteData]):
             equipment=self._filtered(self._inventory),
             readings={r["point_uuid"]: r for r in readings.get("readings", [])},
         )
+
+    @staticmethod
+    def _stream_map(equipment: list[dict[str, Any]]) -> dict[str, list[tuple[str, float]]]:
+        streams: dict[str, list[tuple[str, float]]] = {}
+        for e in equipment:
+            for p in e.get("points", []):
+                if p.get("stream_id") and p.get("scale") is not None:
+                    streams.setdefault(p["stream_id"], []).append((p["point_uuid"], float(p["scale"])))
+        return streams
+
+    @callback
+    def apply_push(self, readings: list[dict[str, Any]]) -> None:
+        """Merge pushed readings and refresh entities. Uses async_update_listeners,
+        not async_set_updated_data, which would push the next poll back on every
+        message and starve the reconcile poll."""
+        if self.data is None:
+            return
+        changed = False
+        for r in readings:
+            if not isinstance(r, dict):
+                continue
+            raw = r.get("value")
+            for point_uuid, scale in self._streams.get(str(r.get("stream_id")), ()):
+                value = raw * scale if isinstance(raw, (int, float)) and not isinstance(raw, bool) else raw
+                self.data.readings[point_uuid] = {
+                    "point_uuid": point_uuid, "value": value, "updated_at": r.get("updated_at"),
+                }
+                changed = True
+        if changed:
+            self.async_update_listeners()
+
+    @callback
+    def set_push_connected(self, connected: bool) -> None:
+        """Poll hourly while pushes flow, at the configured interval otherwise."""
+        self.update_interval = PUSH_RECONCILE_INTERVAL if connected else self._poll_interval
+        if not connected:
+            # Catch up on anything missed while the link was down.
+            self.hass.async_create_task(self.async_request_refresh())
 
     @staticmethod
     def _point_ids(equipment: list[dict[str, Any]] | None) -> set[str] | None:

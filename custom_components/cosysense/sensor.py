@@ -13,7 +13,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import CosysenseConfigEntry
-from .const import ENERGY_CLASSES, GAS_LITRES, SENSOR_KINDS, UNITS, SensorKind
+from .const import (
+    ENERGY_CLASSES,
+    GAS_LITRES,
+    METER_REGISTER_CLASS,
+    METER_REGISTER_DEVICE_CLASSES,
+    SENSOR_KINDS,
+    UNITS,
+    SensorKind,
+)
 from .coordinator import CosysenseCoordinator
 from .entity import CosysensePointEntity, entity_names, humanize
 
@@ -22,13 +30,20 @@ def sensor_kind(point: dict[str, Any]) -> SensorKind:
     return SENSOR_KINDS.get(point["entity_class"]) or SensorKind(humanize(point["entity_class"].removesuffix("_Sensor")))
 
 
-def describe(point: dict[str, Any]) -> tuple[SensorKind, SensorDeviceClass | None, str | None, float, SensorStateClass | None]:
+def register_device_class(equipment: dict[str, Any]) -> SensorDeviceClass | None:
+    equipment_class = equipment.get("entity_class") or ""
+    return next((dc for key, dc in METER_REGISTER_DEVICE_CLASSES if key in equipment_class), None)
+
+
+def describe(point: dict[str, Any], equipment: dict[str, Any] | None = None) -> tuple[SensorKind, SensorDeviceClass | None, str | None, float, SensorStateClass | None]:
     """(kind, device class, unit, multiplier, state class) for one point."""
     kind = sensor_kind(point)
     if point.get("value_type") == "enum":
         return kind, None, None, 1.0, None
     unit, scale = UNITS.get(point.get("unit") or "", (None, 1.0))
     device_class = kind.device_class
+    if point["entity_class"] == METER_REGISTER_CLASS:
+        device_class = register_device_class(equipment or {})
     if device_class == SensorDeviceClass.GAS and point.get("unit") == GAS_LITRES[0]:
         unit, scale = GAS_LITRES[1]
     if device_class is not None and unit is None and device_class not in (
@@ -61,7 +76,7 @@ class CosysenseSensor(CosysensePointEntity, SensorEntity):
     def __init__(self, coordinator: CosysenseCoordinator, equipment: dict[str, Any],
                  point: dict[str, Any], name: str) -> None:
         super().__init__(coordinator, equipment, point, name)
-        kind, device_class, unit, scale, state_class = describe(point)
+        kind, device_class, unit, scale, state_class = describe(point, equipment)
         self._scale = scale
         self._attr_device_class = device_class
         self._attr_native_unit_of_measurement = unit

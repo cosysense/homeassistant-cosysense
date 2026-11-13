@@ -81,6 +81,16 @@ async def test_energy_dashboard_fields(hass: HomeAssistant, mock_api, entry, fre
     assert (water.attributes["device_class"], water.attributes["state_class"]) == ("water", "total_increasing")
 
 
+async def test_meter_register_device_class_follows_the_meter(hass: HomeAssistant, mock_api, entry, freezer) -> None:
+    freezer.move_to(NOW)
+    await _setup(hass, entry)
+    for point_n, device_class, unit in ((205, "energy", "kWh"), (302, "gas", "m³"), (403, "water", "m³")):
+        register = _entity(hass, point_n)
+        assert (register.attributes["device_class"], register.attributes["state_class"],
+                register.attributes["unit_of_measurement"]) == (device_class, "total_increasing", unit)
+        assert register.name.endswith("Meter reading")
+
+
 async def test_duplicate_classes_get_distinct_names(hass: HomeAssistant, mock_api, entry, freezer) -> None:
     freezer.move_to(NOW)
     await _setup(hass, entry)
@@ -99,7 +109,7 @@ async def test_revoked_token_asks_for_reauth(hass: HomeAssistant, mock_api, entr
     await _setup(hass, entry)
     mock_api.clear_requests()
     mock_api.post(COGNITO, status=400, json={"__type": "NotAuthorizedException", "message": "User is disabled."})
-    freezer.tick(timedelta(seconds=121))
+    freezer.tick(timedelta(seconds=901))  # one default poll interval
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
     assert _entity(hass, 101).state == STATE_UNAVAILABLE

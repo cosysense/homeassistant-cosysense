@@ -104,6 +104,14 @@
           "unit": "UNITLESS",
           "cumulative": false,
           "value_type": "numeric"
+        },
+        {
+          "point_uuid": "00000000-0000-4000-8000-000000000205",
+          "name": "meter-meter_register",
+          "entity_class": "Meter_Register_Sensor",
+          "unit": "KiloW-HR",
+          "cumulative": true,
+          "value_type": "numeric"
         }
       ]
     },
@@ -123,6 +131,14 @@
           "name": "gas reader (0A03)-index",
           "entity_class": "Natural_Gas_Usage_Sensor",
           "unit": "L",
+          "cumulative": true,
+          "value_type": "numeric"
+        },
+        {
+          "point_uuid": "00000000-0000-4000-8000-000000000302",
+          "name": "meter-meter_register",
+          "entity_class": "Meter_Register_Sensor",
+          "unit": "M3",
           "cumulative": true,
           "value_type": "numeric"
         }
@@ -154,6 +170,14 @@
           "unit": "UNITLESS",
           "cumulative": false,
           "value_type": "enum"
+        },
+        {
+          "point_uuid": "00000000-0000-4000-8000-000000000403",
+          "name": "meter-meter_register",
+          "entity_class": "Meter_Register_Sensor",
+          "unit": "M3",
+          "cumulative": true,
+          "value_type": "numeric"
         }
       ]
     }

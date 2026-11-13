@@ -17,6 +17,12 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: Cosysen
     return {
         "entry": async_redact_data({"data": dict(entry.data), "options": dict(entry.options)}, TO_REDACT),
         "last_update_success": coordinator.last_update_success,
+        "poll_interval_s": coordinator.update_interval.total_seconds() if coordinator.update_interval else None,
+        "push": {
+            "enabled": coordinator.push_config is not None,
+            "connected": bool(getattr(coordinator.push, "connected", False)),
+            "messages": getattr(coordinator.push, "messages", 0),
+        },
         "equipment": coordinator.data.equipment,
         "readings": list(coordinator.data.readings.values()),
     }

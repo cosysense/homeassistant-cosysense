@@ -21,15 +21,17 @@ Manual install: copy `custom_components/cosysense` into your `config/custom_comp
 
 | Option | Default | Range |
 | --- | --- | --- |
-| Poll interval | 120 s | 30 to 900 s |
+| Poll interval | 900 s | 60 to 3600 s (hourly while live updates flow) |
 | Mark a sensor unavailable after no update for | 3 h | 1 to 48 h |
 | Buildings and levels to show | all | any subset |
 
 ## How it behaves
 
+- Most sensors report every 15 minutes, so the default poll matches that.
+- Live updates: changed readings (power, occupancy, doors and the rest) are pushed to Home Assistant as they arrive, over a secure MQTT connection the integration opens with your token. No port forwarding or public URL is needed. While live updates flow, the poll drops to hourly to catch anything missed. If the connection drops, polling resumes at the configured interval until it is back. The first live update can take about a minute after Home Assistant starts.
 - The latest reading of every point is fetched each poll. The sensor list is refreshed hourly; new or removed sensors reload the entry.
 - Values arrive calibrated. Gas reported in litres is shown in m³.
-- The token is exchanged for a short-lived session on every poll. If it expires or is revoked, the entities go unavailable and Home Assistant asks for a new token.
+- The token is exchanged for a short-lived session on every poll and at least hourly for live updates. If it expires or is revoked, the entities go unavailable and Home Assistant asks for a new token.
 - A steady reading can look up to five minutes older than the sensor's last report. That is expected.
 - Diagnostics downloads hide the client ID and refresh token.
 

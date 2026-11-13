@@ -82,6 +82,12 @@ class CosysenseApi:
             raise CosysenseError("sign-in service returned no ID token")
         self._id_token = token
 
+    async def id_token(self) -> str:
+        """A fresh ID token, for the push connection's password."""
+        await self.refresh()
+        assert self._id_token is not None
+        return self._id_token
+
     async def _get(self, path: str) -> Any:
         if self._id_token is None:
             await self.refresh()

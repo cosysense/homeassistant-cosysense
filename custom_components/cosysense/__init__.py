@@ -19,6 +19,7 @@ from .const import (
 )
 from .coordinator import CosysenseCoordinator
 from .entity import site_device
+from .push import CosysensePush
 
 PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
@@ -45,6 +46,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: CosysenseConfigEntry) ->
     dr.async_get(hass).async_get_or_create(config_entry_id=entry.entry_id, **site_device(coordinator))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_options_updated))
+    if coordinator.push_config:
+        push = CosysensePush(
+            hass, coordinator.api, coordinator.push_config, entry.entry_id,
+            coordinator.apply_push, coordinator.set_push_connected,
+        )
+        coordinator.push = push
+        push.start()
+        entry.async_on_unload(push.stop)
     return True
 
 

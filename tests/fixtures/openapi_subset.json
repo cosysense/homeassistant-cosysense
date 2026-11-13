@@ -414,6 +414,30 @@
             "title": "Point Uuid",
             "type": "string"
           },
+          "scale": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Multiply a pushed numeric value by this to get the polled value (calibration and unit conversion). Set together with stream_id.",
+            "title": "Scale"
+          },
+          "stream_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Key of this point in pushed readings; absent when push is off or the point cannot be pushed (then it is read by polling).",
+            "title": "Stream Id"
+          },
           "unit": {
             "anyOf": [
               {
@@ -439,6 +463,32 @@
           "entity_class"
         ],
         "title": "SitePoint",
+        "type": "object"
+      },
+      "SitePush": {
+        "properties": {
+          "authorizer": {
+            "description": "Custom authorizer name: send it as username query x-amz-customauthorizer-name, with the ID token as the password.",
+            "title": "Authorizer",
+            "type": "string"
+          },
+          "host": {
+            "description": "MQTT broker host (AWS IoT Core). Connect on port 443 with ALPN mqtt.",
+            "title": "Host",
+            "type": "string"
+          },
+          "topic": {
+            "description": "Subscribe here. Each message is JSON {readings: [{stream_id, value, updated_at}]} with the points that changed; a value is raw, multiply numbers by the point's scale.",
+            "title": "Topic",
+            "type": "string"
+          }
+        },
+        "required": [
+          "host",
+          "authorizer",
+          "topic"
+        ],
+        "title": "SitePush",
         "type": "object"
       },
       "SiteReading": {
@@ -511,6 +561,17 @@
             },
             "title": "Equipment",
             "type": "array"
+          },
+          "push": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SitePush"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where changed readings are pushed; absent when push is off, then poll only."
           },
           "site_uuid": {
             "title": "Site Uuid",
@@ -637,7 +698,7 @@
     },
     "/api/sites/{site_uuid}/sensors": {
       "get": {
-        "description": "Every sensor and meter on the site that has at least one live point,\nwith room, level and building names. Changes only when the site is remodelled:\npoll it rarely (hourly).",
+        "description": "Every sensor and meter on the site that has at least one live point,\nwith room, level and building names. Changes only when the site is remodelled:\npoll it rarely (hourly). On sites with push on, points carry a stream_id and\nscale and the push block says where changed readings are pushed.",
         "operationId": "customer_site_sensors",
         "parameters": [
           {

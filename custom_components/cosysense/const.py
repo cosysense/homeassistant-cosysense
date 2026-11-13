@@ -40,9 +40,12 @@ CONF_SCAN_INTERVAL = "scan_interval"
 CONF_LEVELS = "levels"
 CONF_STALE_HOURS = "stale_hours"
 
-DEFAULT_SCAN_INTERVAL = 120
-MIN_SCAN_INTERVAL = 30
-MAX_SCAN_INTERVAL = 900
+# Most sensors report every 15 min, so polling faster mostly re-reads the same
+# values. Sites with push on get changes live and poll only to reconcile.
+DEFAULT_SCAN_INTERVAL = 900
+MIN_SCAN_INTERVAL = 60
+MAX_SCAN_INTERVAL = 3600
+PUSH_RECONCILE_INTERVAL = timedelta(hours=1)
 DEFAULT_STALE_HOURS = 3
 
 INVENTORY_REFRESH = timedelta(hours=1)
@@ -83,6 +86,7 @@ SENSOR_KINDS: dict[str, SensorKind] = {
     "Power_Factor_Sensor": SensorKind("Power factor", SensorDeviceClass.POWER_FACTOR),
     "Natural_Gas_Usage_Sensor": SensorKind("Gas", SensorDeviceClass.GAS),
     "Water_Usage_Sensor": SensorKind("Water", SensorDeviceClass.WATER),
+    "Meter_Register_Sensor": SensorKind("Meter reading"),
     "Valve_Position_Sensor": SensorKind("Valve position"),
     "Pressure_Sensor": SensorKind("Pressure", SensorDeviceClass.PRESSURE),
     "PM2.5_Sensor": SensorKind("PM2.5", SensorDeviceClass.PM25),
@@ -135,3 +139,12 @@ GAS_LITRES = ("L", (UnitOfVolume.CUBIC_METERS, 0.001))
 # Device classes the Energy dashboard reads; cumulative points of these classes
 # are total_increasing.
 ENERGY_CLASSES = frozenset({SensorDeviceClass.ENERGY, SensorDeviceClass.GAS, SensorDeviceClass.WATER})
+
+# A Meter_Register_Sensor carries the unit of its meter, so its device class comes
+# from the equipment class (Gas_Meter, Building_Water_Meter, ...).
+METER_REGISTER_CLASS = "Meter_Register_Sensor"
+METER_REGISTER_DEVICE_CLASSES = (
+    ("Gas", SensorDeviceClass.GAS),
+    ("Water", SensorDeviceClass.WATER),
+    ("Electrical", SensorDeviceClass.ENERGY),
+)
